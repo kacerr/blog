@@ -1,10 +1,11 @@
 # Requesty, limity & throttling v kubernetes prostredi
 
 ## osnova
-- requesty, limity: lehke vysvetleni
-- zakladni doporuceni jak je requesty / limity nastavit
-- throttling v kube: co to je a jake ma dusledky
-- aplikace citlive na response time: jak to nastavit o nich
+- [requesty, limity: lehke vysvetleni](#Cast-#1-requesty-a-limity)
+- [zakladni doporuceni jak je requesty / limity nastavit](#zakladni-doporuceni)
+- [throttling v kube: co to je a jake ma dusledky](#Cast-#2-Cpu-throttling)
+- [aplikace citlive na response time: jak to nastavit o nich](#Cast-#3-Aplikace-citlive-na-response-time)
+- [extras: prometheus queries](#extras-prometheus-queries) 
 - zdroje informaci
 
 
@@ -19,7 +20,19 @@ CPU je takzvane "compressible resource", coz znamena ze neni-li dostatek cpu tak
 Memory je "uncompressible resource" a v pripade, ze by na worker nodu chtely containery spotrebovat vice pameti nez je k dispozici prijde dohry OOM Killer, ktery podle definovanych pravidel situaci vyresi zabitim nekterych podu. Pokud container v podu prekroci svuj vlastni memory limit bude pod take zabit.
 
 ## zakladni doporuceni
+Uplne nejzakladnejsi rada jak nastavit requesty/limity by mohla znit zhruba takto: "Nastavte request na cca 80% toho co vyzaduje bezny provoz aplikace a limit tak aby pokryl beznou spicku". Limit pro pamet bude spis vychazet ze skutecnych naroku aplikace na pamet, ktere obvykle muzete bud nastavit nebo odhadnout. Co se tyce pameti, tak limit musi byt nataven tak aby se tam "vesla", jinak bude dochazet k opakovanym restartum podu kdyz vyuzita pamet prekroci limit.
 
+Konkretni hodnoty nenastavujme jen tak "od oka", ale napriklad nasledujicim postupem
+1. pustim pod s rozumne odhadnutym requestm (cpu i memory) a bez limitu
+2. ve spolupraci s nejakm nastrojem na stress testing postupne vytezuji aplikaci a sbiram metriky
+    - container_memory_working_set_bytes
+    - container_cpu_usage_seconds_total
+    - container_cpu_cfs_throttled_seconds_total  
+
+
+    rate techto metrik nam pomuze urcit vhodny limit (ukazkove prometheus queries jsou v [zaveru clanku](#extras-prometheus-queries))
+3. limit pro pamet musi byt > `rate(container_memory_working_set_bytes)`, jinak bude pod zabit
+4. limit pro cpu muze byt o neco nizsi nez nejvyssi namereny `rate(container_cpu_usage_seconds_total)`, jak moc niz zalezi asi zejmena na citlivosti aplikace na dobu odezvy. Je-li rychlost a konzistence odezvy dulezita, tak bychom meli cilit na nizky throttling (`rate(ontainer_cpu_cfs_throttled_seconds_total)`), jak presne nizky je asi trochu filozoficka otazka a zalezi asi na prioritach (performance vs density). Viz: https://youtu.be/UE7QX98-kO0?t=2249)
 
 
 ## hranicni pripady a dusledky
@@ -57,3 +70,16 @@ Pokud mame posbirane metriky z cAdvisoru (zrejme ano, je soucasti kubeletu), tak
 
 Metriku `container_cpu_cfs_throttled_seconds_total` chapu jako pocet vterin kdy container byl throttlovan == chtel neco delat, ale CFS scheduler ho nenechal.
 `rate(container_cpu_cfs_throttled_seconds_total[1m])` nam tedy rika kolik vterin za vterinu container nemohl "neco delat, i kdyz chtel". Toto cislo muze byt bez problemu mnohem vetsi nez 1. Duvodem je prave to ze v containeru muze byt vice procesu/threadu, ktere jsou po vycerpani pridelenych cpu_shares blokovany.
+
+## extras: prometheus queries
+```
+# throttling rate for pod
+sum(rate(container_cpu_cfs_throttled_seconds_total{namespace="$namespace", pod=~"$pod", container!="", container!="POD"}[1m])) by (pod) or sum(rate(container_cpu_cfs_throttled_seconds_total{namespace="$namespace", pod_name=~"$pod", container_name!="", container_name!="POD"}[1m])) by (pod_name) 
+
+# cpu usage for pod
+sum(rate(container_cpu_usage_seconds_total{namespace="$namespace", pod=~"$pod", container!="", container!="POD"}[1m])) by (pod) or sum(rate(container_cpu_usage_seconds_total{namespace="$namespace", pod_name=~"$pod", container_name!="", container_name!="POD"}[1m])) by (pod_name)
+
+# memory usage for pod
+sum(container_memory_working_set_bytes{namespace="$namespace", pod="$pod", container!="", container!="POD", container=~"$containers"}) or sum(container_memory_working_set_bytes{namespace="$namespace", pod_name="$pod", container_name!="", container_name!="POD", container_name=~"$containers"})
+
+```
