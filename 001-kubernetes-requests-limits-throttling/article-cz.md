@@ -10,9 +10,9 @@
 
 
 # Cast #1: requesty a limity
-V kostce slouzi requesty a limity k tomu, aby bylo v kube clusteru mozne nastavit nejake "rozumne" souziti vice aplikaci. A to tak aby za beznyvch okolnosti jedna aplikace nemohla "utlacovat" ostatni, scheduler dokazal pody aplikaci rozmistit na worker nody, dulezitym aplikacim bylo mozne zajistit dostatecny vykon a stabilitu, eventuelne prioritu. Dale rozumne nastaveni requestu a limitu umozni prijatelnou utilizaci zdroju na serverech.  
+V kostce slouzi requesty a limity k tomu, aby bylo v kube clusteru mozne nastavit nejake "rozumne" souziti vice aplikaci. A to tak aby za beznych okolnosti jedna aplikace nemohla "utlacovat" ostatni, scheduler dokazal pody aplikaci rozmistit na worker nody, dulezitym aplikacim bylo mozne zajistit dostatecny vykon a stabilitu, eventuelne prioritu. Dale rozumne nastaveni requestu a limitu umozni prijatelnou utilizaci zdroju na serverech (densitu).  
 
-Z predchoziho popisu je naprosto zjevne, ze neni mozne splnit vsechno najednou, takze cely problem je o nalezeni dobreho kompromisu vhodneho pro nas use case.
+Z predchoziho popisu je naprosto zjevne, ze neni mozne splnit vsechno najednou, takze cely problem je o nalezeni dobreho kompromisu vhodneho pro nas use cases.
 
 ## typy zdroju
 CPU je takzvane "compressible resource", coz znamena ze neni-li dostatek cpu tak pody dale bezi, jen je cpu prideleno podle nejakych pravidel (ktere vychazeji z qos tridy podu a jeho CPU requestu) a nektere pody pobezi pomalejil, protoze se na ne jiz nedostane dostatecny dil cpu.
