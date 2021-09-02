@@ -5,10 +5,10 @@ title: Kubernetes requests, limits and throttling (cesky)
 
 # Requesty, limity & throttling v kubernetes prostredi
 ## osnova
-- [requesty, limity: lehke vysvetleni](#Cast-#1-requesty-a-limity)
+- [requesty, limity: lehke vysvetleni](#cast-1-requesty-a-limity)
 - [zakladni doporuceni jak je requesty / limity nastavit](#zakladni-doporuceni)
-- [throttling v kube: co to je a jake ma dusledky](#Cast-#2-Cpu-throttling)
-- [aplikace citlive na response time: jak to nastavit o nich](#Cast-#3-Aplikace-citlive-na-response-time)
+- [throttling v kube: co to je a jake ma dusledky](#cast-2-cpu-throttling)
+- [aplikace citlive na response time: jak to nastavit o nich](#cast-3-aplikace-citlive-na-response-time)
 - [extras: prometheus queries](#extras-prometheus-queries) 
 - zdroje informaci
 
