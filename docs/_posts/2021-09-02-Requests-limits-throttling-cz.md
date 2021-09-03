@@ -4,8 +4,6 @@ title: Kubernetes requests, limits and throttling (cesky)
 comments: true
 ---
 
-Pokusim se trochu popsat jak requesty/limity pro resourcy v kubernetu funguji. Jakym zpusobem najit jejich vhodne zakladni nastaveni, a jak se stavet k trochu specifictejsim use-casum. 
-
 ## osnova
 - [requesty, limity: lehke vysvetleni](#cast-1-requesty-a-limity)
 - [zakladni doporuceni jak je requesty / limity nastavit](#zakladni-doporuceni)
