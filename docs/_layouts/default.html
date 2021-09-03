@@ -1,39 +1,18 @@
-<!DOCTYPE html>
-<html lang="en">
+---
+theme :
+  name : dbyll
+---
+{% include default.html %}
 
-  {% include head.html %}
+{% if site.google_analytics %}
+<!-- Asynchronous Google Analytics snippet -->
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
 
-  <body>
-    <nav class="nav">
-      <div class="nav-container">
-        <a href="{{ site.baseurl }}/">
-          <h2 class="nav-title">{{ site.title }}</h2>
-        </a>
-        <ul class="nav-social-icons">
-          {% if site.social.email %}
-            <li><a target="_blank" href="mailto:{{ site.social.email }}"><i class="fas fa-envelope"></i></a></li>
-          {% endif %}
-          {% if site.social.github %}
-            <li><a target="_blank" href="{{ site.social.github }}"><i class="fab fa-github"></i></a></li>
-          {% endif %}
-          {% if site.social.twitter %}
-            <li><a target="_blank" href="{{ site.social.twitter }}"><i class="fab fa-twitter"></i></a></li>
-          {% endif %}
-          {% if site.social.linkedin %}
-            <li><a target="_blank" href="{{ site.social.linkedin }}"><i class="fab fa-linkedin-in"></i></a></li>
-          {% endif %}
-        </ul>
-      </div>
-    </nav>
-
-    <main>
-      {{ content }}
-    </main>
-
-    <footer>
-      <span>
-        &copy; <time datetime="{{ site.time }}">{{ site.time | date: '%Y' }}</time> {{ site.author.name }}. Powered by Jekyll and <a href="#">Rain</a> theme.
-      </span>
-    </footer>
-  </body>
-</html>
+  ga('create', '{{ site.google_analytics }}', 'auto');
+  ga('send', 'pageview');
+</script>
+{% endif %}
